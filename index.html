@@ -25,7 +25,6 @@
         .audio-label { display: block; margin-bottom: 10px; }
         audio { width: 100%; max-width: 400px; margin: 10px auto; display: block; }
 
-        /* Multiple choice styles */
         .choices { margin: 20px 0; }
         .choice-btn {
             display: block;
@@ -40,21 +39,10 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .choice-btn:hover:not(.disabled) {
-            background: #f5f5f5;
-        }
-        .choice-btn.correct {
-            border-color: #2d6a4f;
-            background: #d4edda;
-        }
-        .choice-btn.incorrect {
-            border-color: #c0392b;
-            background: #f8d7da;
-        }
-        .choice-btn.disabled {
-            cursor: default;
-            opacity: 0.7;
-        }
+        .choice-btn:hover:not(.disabled) { background: #f5f5f5; }
+        .choice-btn.correct { border-color: #2d6a4f; background: #d4edda; }
+        .choice-btn.incorrect { border-color: #c0392b; background: #f8d7da; }
+        .choice-btn.disabled { cursor: default; opacity: 0.7; }
 
         .answer-section { margin-top: 25px; text-align: center; }
         .answer-reveal { display: none; margin-top: 25px; text-align: center; }
@@ -68,6 +56,7 @@
             padding-bottom: 56.25%;
             margin: 15px auto;
             border: 1px solid #000;
+            background: #000;
         }
         .video-container iframe {
             position: absolute;
@@ -75,6 +64,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            border: none;
         }
         .next-btn { background: #fff; color: #000; border: 1px solid #000; padding: 12px 40px; cursor: pointer; font-family: inherit; font-size: 1em; margin-top: 20px; }
         .next-btn:hover { background: #f0f0f0; }
@@ -107,9 +97,7 @@
                     <div class="composer-name">Maurice Ravel</div>
                     <div class="piece-name">Boléro (1928)</div>
                     <div class="conductor-name">Concert Performance</div>
-                    <div class="video-container">
-                        <div id="player-1"></div>
-                    </div>
+                    <div class="video-container" id="video-1"></div>
                 </div>
             </div>
             <button class="next-btn" onclick="nextQuestion(2)">Next Question</button>
@@ -130,9 +118,7 @@
                     <div class="composer-name">Bedřich Smetana</div>
                     <div class="piece-name">The Moldau (Vltava) (1874)</div>
                     <div class="conductor-name">Daniel Barenboim · Wiener Philharmoniker</div>
-                    <div class="video-container">
-                        <div id="player-2"></div>
-                    </div>
+                    <div class="video-container" id="video-2"></div>
                 </div>
             </div>
             <button class="next-btn" onclick="nextQuestion(3)">Next Question</button>
@@ -153,9 +139,7 @@
                     <div class="composer-name">Gioachino Rossini</div>
                     <div class="piece-name">William Tell Overture (1829)</div>
                     <div class="conductor-name">Claudio Abbado · Berliner Philharmoniker</div>
-                    <div class="video-container">
-                        <div id="player-3"></div>
-                    </div>
+                    <div class="video-container" id="video-3"></div>
                 </div>
             </div>
             <button class="next-btn" onclick="nextQuestion(4)">Next Question</button>
@@ -176,9 +160,7 @@
                     <div class="composer-name">Jean Sibelius</div>
                     <div class="piece-name">Finlandia (1899)</div>
                     <div class="conductor-name">BBC Proms Performance</div>
-                    <div class="video-container">
-                        <div id="player-4"></div>
-                    </div>
+                    <div class="video-container" id="video-4"></div>
                 </div>
             </div>
             <button class="next-btn" onclick="nextQuestion(5)">Next Question</button>
@@ -199,9 +181,7 @@
                     <div class="composer-name">George Gershwin</div>
                     <div class="piece-name">Rhapsody in Blue (1924)</div>
                     <div class="conductor-name">Leonard Bernstein · New York Philharmonic (1976)</div>
-                    <div class="video-container">
-                        <div id="player-5"></div>
-                    </div>
+                    <div class="video-container" id="video-5"></div>
                 </div>
             </div>
             <button class="next-btn" onclick="showFinal()">Finish Quiz</button>
@@ -216,11 +196,7 @@
         </div>
     </div>
 
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
-        // All piece names for multiple choice
         const allPieces = [
             "Ravel: Boléro",
             "Smetana: The Moldau (Vltava)",
@@ -229,7 +205,6 @@
             "Gershwin: Rhapsody in Blue"
         ];
 
-        // Additional distractor pieces
         const distractors = [
             "Beethoven: Symphony No. 5",
             "Dvořák: New World Symphony",
@@ -243,22 +218,17 @@
             "Saint-Saëns: Carnival of the Animals"
         ];
 
-        // Video data: YouTube ID and trim offset (seconds to sync audio with video)
-        // trimOffset = seconds trimmed from audio start (to sync video)
+        // Video IDs and trim offsets (seconds trimmed from audio)
         const videoData = {
-            1: { id: 'Dh9bUD-hC0A', trimOffset: 10.0 },   // Boléro
-            2: { id: 'Kl0-Pdo0vi8', trimOffset: 2.6 },    // Moldau
-            3: { id: 'tJoDL1cSRjM', trimOffset: 0.87 },   // William Tell
-            4: { id: 'fE0RbPsC9uE', trimOffset: 7.5 },    // Finlandia
-            5: { id: 'IGpMLoFyjwA', trimOffset: 1.4 }     // Rhapsody in Blue
+            1: { id: 'Dh9bUD-hC0A', trimOffset: 10.0 },
+            2: { id: 'Kl0-Pdo0vi8', trimOffset: 2.6 },
+            3: { id: 'tJoDL1cSRjM', trimOffset: 0.87 },
+            4: { id: 'fE0RbPsC9uE', trimOffset: 7.5 },
+            5: { id: 'IGpMLoFyjwA', trimOffset: 1.4 }
         };
 
-        // Store YouTube player instances
-        const players = {};
-        let apiReady = false;
         let score = 0;
 
-        // Shuffle array
         function shuffle(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -268,17 +238,12 @@
             return arr;
         }
 
-        // Generate choices for a question
         function generateChoices(questionNum) {
             const correctIndex = questionNum - 1;
             const correctAnswer = allPieces[correctIndex];
-
-            // Get wrong answers from other correct answers + distractors
             const otherCorrect = allPieces.filter((_, i) => i !== correctIndex);
             const allWrong = [...otherCorrect, ...distractors];
             const selectedWrong = shuffle(allWrong).slice(0, 3);
-
-            // Combine and shuffle
             const choices = shuffle([correctAnswer, ...selectedWrong]);
 
             const container = document.getElementById('choices-' + questionNum);
@@ -293,12 +258,10 @@
             });
         }
 
-        // Handle choice selection
         function handleChoice(questionNum, btn, isCorrect) {
             const card = document.querySelector(`[data-question="${questionNum}"]`);
             const buttons = card.querySelectorAll('.choice-btn');
 
-            // Disable all buttons
             buttons.forEach(b => b.classList.add('disabled'));
 
             if (isCorrect) {
@@ -306,7 +269,6 @@
                 score++;
             } else {
                 btn.classList.add('incorrect');
-                // Highlight correct answer
                 buttons.forEach(b => {
                     if (allPieces[questionNum - 1] === b.textContent) {
                         b.classList.add('correct');
@@ -314,35 +276,9 @@
                 });
             }
 
-            // Show answer after brief delay
             setTimeout(() => {
                 showAnswer(questionNum);
             }, 800);
-        }
-
-        // Called when YouTube API is ready
-        function onYouTubeIframeAPIReady() {
-            apiReady = true;
-        }
-
-        // Create a YouTube player
-        function createPlayer(num, startTime) {
-            const data = videoData[num];
-            if (!data) return;
-
-            if (players[num]) {
-                players[num].destroy();
-            }
-
-            players[num] = new YT.Player('player-' + num, {
-                videoId: data.id,
-                playerVars: {
-                    start: Math.floor(startTime),
-                    autoplay: 1,
-                    modestbranding: 1,
-                    rel: 0
-                }
-            });
         }
 
         function stopAllAudio() {
@@ -352,28 +288,11 @@
             });
         }
 
-        function stopAllPlayers() {
-            Object.values(players).forEach(player => {
-                try { player.stopVideo(); } catch(e) {}
+        function stopAllVideos() {
+            document.querySelectorAll('.video-container').forEach(container => {
+                container.innerHTML = '';
             });
         }
-
-        // Initialize audio listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Generate choices for all questions
-            for (let i = 1; i <= 5; i++) {
-                generateChoices(i);
-            }
-
-            document.querySelectorAll('audio').forEach(audio => {
-                audio.addEventListener('play', function() {
-                    document.querySelectorAll('audio').forEach(other => {
-                        if (other !== audio) other.pause();
-                    });
-                    stopAllPlayers();
-                });
-            });
-        });
 
         function showAnswer(num) {
             const card = document.querySelector(`[data-question="${num}"]`);
@@ -381,21 +300,23 @@
             const audioTime = audio ? audio.currentTime : 0;
 
             stopAllAudio();
-            stopAllPlayers();
+            stopAllVideos();
 
             document.getElementById('answer-' + num).classList.add('visible');
 
+            // Create iframe embed
             const data = videoData[num];
-            const ytStartTime = data.trimOffset + audioTime;
-
-            if (apiReady) {
-                createPlayer(num, ytStartTime);
-            }
+            const startTime = Math.floor(data.trimOffset + audioTime);
+            const container = document.getElementById('video-' + num);
+            container.innerHTML = `<iframe
+                src="https://www.youtube.com/embed/${data.id}?start=${startTime}&autoplay=1"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>`;
         }
 
         function nextQuestion(num) {
             stopAllAudio();
-            stopAllPlayers();
+            stopAllVideos();
 
             document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('active'));
             document.querySelector(`[data-question="${num}"]`).classList.add('active');
@@ -405,7 +326,7 @@
 
         function showFinal() {
             stopAllAudio();
-            stopAllPlayers();
+            stopAllVideos();
 
             document.getElementById('score').textContent = score;
             document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('active'));
@@ -419,8 +340,8 @@
             document.querySelectorAll('.choice-btn').forEach(btn => {
                 btn.classList.remove('correct', 'incorrect', 'disabled');
             });
+            stopAllVideos();
 
-            // Regenerate choices
             for (let i = 1; i <= 5; i++) {
                 generateChoices(i);
             }
@@ -430,6 +351,13 @@
             document.getElementById('current').textContent = '1';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            for (let i = 1; i <= 5; i++) {
+                generateChoices(i);
+            }
+        });
     </script>
 </body>
 </html>
