@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classical Music Quiz</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Adobe Caslon Pro', Caslon, Georgia, serif;
+            background: #fff;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 5px; font-size: 1.8em; font-weight: normal; }
+        .subtitle { text-align: center; margin-bottom: 30px; font-style: italic; }
+        .progress { text-align: center; font-size: 1.1em; margin-bottom: 20px; }
+        .quiz-card { border: 1px solid #000; padding: 25px; margin-bottom: 20px; display: none; }
+        .quiz-card.active { display: block; }
+        .question-number { font-size: 1.2em; margin-bottom: 20px; text-align: center; }
+        .audio-section { margin: 20px 0; text-align: center; }
+        .audio-label { display: block; margin-bottom: 10px; }
+        audio { width: 100%; max-width: 400px; margin: 10px auto; display: block; }
+
+        /* Multiple choice styles */
+        .choices { margin: 20px 0; }
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            font-family: inherit;
+            font-size: 1em;
+            text-align: left;
+            background: #fff;
+            border: 2px solid #000;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .choice-btn:hover:not(.disabled) {
+            background: #f5f5f5;
+        }
+        .choice-btn.correct {
+            border-color: #2d6a4f;
+            background: #d4edda;
+        }
+        .choice-btn.incorrect {
+            border-color: #c0392b;
+            background: #f8d7da;
+        }
+        .choice-btn.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .answer-section { margin-top: 25px; text-align: center; }
+        .answer-reveal { display: none; margin-top: 25px; text-align: center; }
+        .answer-reveal.visible { display: block; }
+        .composer-name { font-size: 1.6em; margin-bottom: 5px; }
+        .piece-name { font-size: 1.2em; font-style: italic; margin-bottom: 5px; }
+        .conductor-name { font-size: 1em; color: #555; margin-bottom: 20px; }
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            margin: 15px auto;
+            border: 1px solid #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .next-btn { background: #fff; color: #000; border: 1px solid #000; padding: 12px 40px; cursor: pointer; font-family: inherit; font-size: 1em; margin-top: 20px; }
+        .next-btn:hover { background: #f0f0f0; }
+        .final-card { text-align: center; padding: 40px 25px; }
+        .final-card h2 { font-size: 1.8em; margin-bottom: 20px; font-weight: normal; }
+        .final-card p { font-size: 1.2em; margin-bottom: 10px; }
+        .score { font-size: 1.4em; margin: 20px 0; }
+        .restart-btn { background: #000; color: #fff; border: 1px solid #000; padding: 12px 40px; cursor: pointer; font-family: inherit; font-size: 1em; margin-top: 25px; }
+        .restart-btn:hover { background: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Classical Music Quiz</h1>
+        <p class="subtitle">Can you name the piece from just the music?</p>
+        <p class="progress">Question <span id="current">1</span> of 5</p>
+
+        <!-- Question 1: Boléro -->
+        <div class="quiz-card active" data-question="1">
+            <div class="question-number">Question 1</div>
+            <div class="audio-section">
+                <span class="audio-label">Listen to this piece...</span>
+                <audio controls>
+                    <source src="bolero_ravel.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="choices" id="choices-1"></div>
+            <div class="answer-section">
+                <div id="answer-1" class="answer-reveal">
+                    <div class="composer-name">Maurice Ravel</div>
+                    <div class="piece-name">Boléro (1928)</div>
+                    <div class="conductor-name">Concert Performance</div>
+                    <div class="video-container">
+                        <div id="player-1"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="next-btn" onclick="nextQuestion(2)">Next Question</button>
+        </div>
+
+        <!-- Question 2: The Moldau -->
+        <div class="quiz-card" data-question="2">
+            <div class="question-number">Question 2</div>
+            <div class="audio-section">
+                <span class="audio-label">Listen to this piece...</span>
+                <audio controls>
+                    <source src="moldau_smetana.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="choices" id="choices-2"></div>
+            <div class="answer-section">
+                <div id="answer-2" class="answer-reveal">
+                    <div class="composer-name">Bedřich Smetana</div>
+                    <div class="piece-name">The Moldau (Vltava) (1874)</div>
+                    <div class="conductor-name">Daniel Barenboim · Wiener Philharmoniker</div>
+                    <div class="video-container">
+                        <div id="player-2"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="next-btn" onclick="nextQuestion(3)">Next Question</button>
+        </div>
+
+        <!-- Question 3: William Tell Overture -->
+        <div class="quiz-card" data-question="3">
+            <div class="question-number">Question 3</div>
+            <div class="audio-section">
+                <span class="audio-label">Listen to this piece...</span>
+                <audio controls>
+                    <source src="william_tell_rossini.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="choices" id="choices-3"></div>
+            <div class="answer-section">
+                <div id="answer-3" class="answer-reveal">
+                    <div class="composer-name">Gioachino Rossini</div>
+                    <div class="piece-name">William Tell Overture (1829)</div>
+                    <div class="conductor-name">Claudio Abbado · Berliner Philharmoniker</div>
+                    <div class="video-container">
+                        <div id="player-3"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="next-btn" onclick="nextQuestion(4)">Next Question</button>
+        </div>
+
+        <!-- Question 4: Finlandia -->
+        <div class="quiz-card" data-question="4">
+            <div class="question-number">Question 4</div>
+            <div class="audio-section">
+                <span class="audio-label">Listen to this piece...</span>
+                <audio controls>
+                    <source src="finlandia_sibelius.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="choices" id="choices-4"></div>
+            <div class="answer-section">
+                <div id="answer-4" class="answer-reveal">
+                    <div class="composer-name">Jean Sibelius</div>
+                    <div class="piece-name">Finlandia (1899)</div>
+                    <div class="conductor-name">BBC Proms Performance</div>
+                    <div class="video-container">
+                        <div id="player-4"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="next-btn" onclick="nextQuestion(5)">Next Question</button>
+        </div>
+
+        <!-- Question 5: Rhapsody in Blue -->
+        <div class="quiz-card" data-question="5">
+            <div class="question-number">Question 5</div>
+            <div class="audio-section">
+                <span class="audio-label">Listen to this piece...</span>
+                <audio controls>
+                    <source src="rhapsody_gershwin.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="choices" id="choices-5"></div>
+            <div class="answer-section">
+                <div id="answer-5" class="answer-reveal">
+                    <div class="composer-name">George Gershwin</div>
+                    <div class="piece-name">Rhapsody in Blue (1924)</div>
+                    <div class="conductor-name">Leonard Bernstein · New York Philharmonic (1976)</div>
+                    <div class="video-container">
+                        <div id="player-5"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="next-btn" onclick="showFinal()">Finish Quiz</button>
+        </div>
+
+        <!-- Final Card -->
+        <div class="quiz-card final-card" data-question="final">
+            <h2>Quiz Complete!</h2>
+            <p class="score">You got <span id="score">0</span> out of 5 correct!</p>
+            <p>Great job!</p>
+            <button class="restart-btn" onclick="restart()">Play Again</button>
+        </div>
+    </div>
+
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // All piece names for multiple choice
+        const allPieces = [
+            "Ravel: Boléro",
+            "Smetana: The Moldau (Vltava)",
+            "Rossini: William Tell Overture",
+            "Sibelius: Finlandia",
+            "Gershwin: Rhapsody in Blue"
+        ];
+
+        // Additional distractor pieces
+        const distractors = [
+            "Beethoven: Symphony No. 5",
+            "Dvořák: New World Symphony",
+            "Tchaikovsky: 1812 Overture",
+            "Mussorgsky: Night on Bald Mountain",
+            "Strauss: Blue Danube Waltz",
+            "Holst: The Planets",
+            "Grieg: In the Hall of the Mountain King",
+            "Bizet: Carmen Suite",
+            "Debussy: Clair de Lune",
+            "Saint-Saëns: Carnival of the Animals"
+        ];
+
+        // Video data: YouTube ID and trim offset (seconds to sync audio with video)
+        // trimOffset = seconds trimmed from audio start (to sync video)
+        const videoData = {
+            1: { id: 'Dh9bUD-hC0A', trimOffset: 10.0 },   // Boléro
+            2: { id: 'Kl0-Pdo0vi8', trimOffset: 2.6 },    // Moldau
+            3: { id: 'tJoDL1cSRjM', trimOffset: 0.87 },   // William Tell
+            4: { id: 'fE0RbPsC9uE', trimOffset: 7.5 },    // Finlandia
+            5: { id: 'IGpMLoFyjwA', trimOffset: 1.4 }     // Rhapsody in Blue
+        };
+
+        // Store YouTube player instances
+        const players = {};
+        let apiReady = false;
+        let score = 0;
+
+        // Shuffle array
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Generate choices for a question
+        function generateChoices(questionNum) {
+            const correctIndex = questionNum - 1;
+            const correctAnswer = allPieces[correctIndex];
+
+            // Get wrong answers from other correct answers + distractors
+            const otherCorrect = allPieces.filter((_, i) => i !== correctIndex);
+            const allWrong = [...otherCorrect, ...distractors];
+            const selectedWrong = shuffle(allWrong).slice(0, 3);
+
+            // Combine and shuffle
+            const choices = shuffle([correctAnswer, ...selectedWrong]);
+
+            const container = document.getElementById('choices-' + questionNum);
+            container.innerHTML = '';
+
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                btn.onclick = () => handleChoice(questionNum, btn, choice === correctAnswer);
+                container.appendChild(btn);
+            });
+        }
+
+        // Handle choice selection
+        function handleChoice(questionNum, btn, isCorrect) {
+            const card = document.querySelector(`[data-question="${questionNum}"]`);
+            const buttons = card.querySelectorAll('.choice-btn');
+
+            // Disable all buttons
+            buttons.forEach(b => b.classList.add('disabled'));
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('incorrect');
+                // Highlight correct answer
+                buttons.forEach(b => {
+                    if (allPieces[questionNum - 1] === b.textContent) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            // Show answer after brief delay
+            setTimeout(() => {
+                showAnswer(questionNum);
+            }, 800);
+        }
+
+        // Called when YouTube API is ready
+        function onYouTubeIframeAPIReady() {
+            apiReady = true;
+        }
+
+        // Create a YouTube player
+        function createPlayer(num, startTime) {
+            const data = videoData[num];
+            if (!data) return;
+
+            if (players[num]) {
+                players[num].destroy();
+            }
+
+            players[num] = new YT.Player('player-' + num, {
+                videoId: data.id,
+                playerVars: {
+                    start: Math.floor(startTime),
+                    autoplay: 1,
+                    modestbranding: 1,
+                    rel: 0
+                }
+            });
+        }
+
+        function stopAllAudio() {
+            document.querySelectorAll('audio').forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        }
+
+        function stopAllPlayers() {
+            Object.values(players).forEach(player => {
+                try { player.stopVideo(); } catch(e) {}
+            });
+        }
+
+        // Initialize audio listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate choices for all questions
+            for (let i = 1; i <= 5; i++) {
+                generateChoices(i);
+            }
+
+            document.querySelectorAll('audio').forEach(audio => {
+                audio.addEventListener('play', function() {
+                    document.querySelectorAll('audio').forEach(other => {
+                        if (other !== audio) other.pause();
+                    });
+                    stopAllPlayers();
+                });
+            });
+        });
+
+        function showAnswer(num) {
+            const card = document.querySelector(`[data-question="${num}"]`);
+            const audio = card.querySelector('audio');
+            const audioTime = audio ? audio.currentTime : 0;
+
+            stopAllAudio();
+            stopAllPlayers();
+
+            document.getElementById('answer-' + num).classList.add('visible');
+
+            const data = videoData[num];
+            const ytStartTime = data.trimOffset + audioTime;
+
+            if (apiReady) {
+                createPlayer(num, ytStartTime);
+            }
+        }
+
+        function nextQuestion(num) {
+            stopAllAudio();
+            stopAllPlayers();
+
+            document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-question="${num}"]`).classList.add('active');
+            document.getElementById('current').textContent = num;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showFinal() {
+            stopAllAudio();
+            stopAllPlayers();
+
+            document.getElementById('score').textContent = score;
+            document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-question="final"]').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function restart() {
+            score = 0;
+            document.querySelectorAll('.answer-reveal').forEach(el => el.classList.remove('visible'));
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('correct', 'incorrect', 'disabled');
+            });
+
+            // Regenerate choices
+            for (let i = 1; i <= 5; i++) {
+                generateChoices(i);
+            }
+
+            document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-question="1"]').classList.add('active');
+            document.getElementById('current').textContent = '1';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
